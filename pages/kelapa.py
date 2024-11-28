@@ -10,8 +10,10 @@ from streamlit_folium import st_folium
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 
 
-st.title("Kelapa Polewali Mandar")
+
+st.title("Hasil Clustering Kelapa Polewali Mandar dan Majene")
 st.markdown("<hr>", unsafe_allow_html=True)
+
 # Sidebar Title yang Terpusat
 st.sidebar.markdown(
     """
@@ -30,15 +32,17 @@ st.sidebar.page_link("pages/kelapa.py", label="Kelapa Kecamatan")
 st.sidebar.markdown("<hr>", unsafe_allow_html=True)
 
 # Membaca dataset dari file Excel
-df = pd.read_excel("kelapaPolman.xlsx")
+df = pd.read_excel("kelapaKecamatan.xlsx")
 x = df.iloc[:, [4, 5]].values
 
 st.header("Isi Dataset")
+# st.write(df)
 st.markdown(df.to_html(classes='styled-table'), unsafe_allow_html=True)
+
 
 # Elbow method untuk menentukan jumlah cluster yang tepat
 clusters = []
-for i in range(1, 6):
+for i in range(1, 11):
     kmeans = KMeans(n_clusters=i, init='k-means++', random_state=42)
     kmeans.fit(x)
     clusters.append(kmeans.inertia_)
@@ -46,7 +50,7 @@ for i in range(1, 6):
 # Plot Elbow
 st.subheader("Elbow Method")
 fig1, ax1 = plt.subplots(figsize=(12, 8))
-sns.lineplot(x=list(range(1, 6)), y=clusters, ax=ax1)
+sns.lineplot(x=list(range(1, 11)), y=clusters, ax=ax1)
 ax1.set_title("Mencari Elbow")
 ax1.set_xlabel("Clusters")
 ax1.set_ylabel("Inertia")
@@ -55,6 +59,7 @@ st.pyplot(fig1)
 # Normalisasi data
 scaler = StandardScaler()
 x_scaled = scaler.fit_transform(x)
+
 st.sidebar.subheader("Nilai jumlah K")
 clust = st.sidebar.slider("Pilih Jumlah Cluster ", 2, 10, 3, 1)
 
@@ -77,6 +82,7 @@ df.columns = df.columns.str.strip()
 
 # Membagi hasil clustering ke dalam tiga kategori: Rendah, Sedang, Tinggi
 cluster_labels = ['Rendah', 'Sedang', 'Tinggi']
+# clusters_split = np.array_split(range(clust), 3)
 # Cek jumlah cluster
 if clust == 2:
     # Jika jumlah cluster 2, hanya gunakan kategori Tinggi dan Rendah
@@ -99,15 +105,16 @@ cluster_colors = {'Rendah': 'green', 'Sedang': 'blue', 'Tinggi': 'red'}
 
 # Membuat plot scatter
 st.subheader("Plot Clustering")
-fig2, ax2 = plt.subplots(figsize=(15, 6))
-sns.scatterplot(x='Kecamatan', y='Produktivitas(Kg/Ha)', hue='Cluster', palette=cluster_colors, s=150, data=df, ax=ax2)
+fig2, ax2 = plt.subplots(figsize=(20, 6))
+sns.scatterplot(x='Kecamatan', y='PRODUKTIVITAS (Kg/Ha/Thn)', hue='Cluster', palette=cluster_colors, s=150, data=df, ax=ax2)
 ax2.set_title("Hasil Clustering")
 ax2.set_xlabel("Kecamatan")
-ax2.set_ylabel("Produktivitas(Kg/Ha)")
+ax2.set_ylabel("PRODUKTIVITAS (Kg/Ha/Thn)")
 st.pyplot(fig2)
 
 st.header("Hasil Cluster")
-st.write(df)
+# st.write(df)
+st.markdown(df.to_html(classes='styled-table'), unsafe_allow_html=True)
 
 # Menampilkan Peta dengan hasil pengelompokan
 st.subheader("Peta Hasil Pengelompokan")
@@ -116,9 +123,9 @@ for idx, row in df.iterrows():
     folium.Marker(
         location=[row['latitude'], row['longtitude']], 
         tooltip=f"Kecamatan {row['Kecamatan']} (Cluster: {row['Cluster']})",
-        icon=folium.Icon(color='green' if row['Cluster'] == 'Rendah' else 'blue' if row['Cluster'] == 'Sedang' else 'red')
+        icon=folium.Icon(color=cluster_colors[row['Cluster']])
     ).add_to(map_loc)
-st_folium(map_loc, width=600)
+st_folium(map_loc, width=700)
 
 # Custom CSS untuk mengubah warna latar belakang
 st.markdown(
@@ -127,17 +134,37 @@ st.markdown(
     body {
         background-color: #020249FF;
     }
+    [data-testid="stSidebarNav"] {
+        display: none;
+    }
     .stApp {
         background-color: #02023EFF;
     }
     [data-testid="stSidebarContent"] {
-    background-color: #020249B9;
+    background-color: #04046BB9;
+    }
+    .st.sidebar.title{
+    text-align: center; 
+    font-weight: bold; 
+    font-style: italic;
+    color: #4CAF50; 
+    font-family: "Courier New", Courier, monospace; font-size: 28px;
+    }
+    .styled-table {
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: 12px;
+        text-align: left;
+        width: 100%;
+    }
+    .styled-table thead tr {
+        background-color: #009879;
+        color: #ffffff;
+        text-align: center;
     }
     header {visibility: hidden;}
     .css-1y4p8pa.e1fqkh3o0 {visibility: hidden;}
-    [data-testid="stSidebarNav"] {
-    display: none;
-    }
+    
     </style>
     """,
     unsafe_allow_html=True
