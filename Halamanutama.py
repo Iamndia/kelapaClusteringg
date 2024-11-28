@@ -16,7 +16,7 @@ st.sidebar.page_link("Halamanutama.py", label="Halamana Utama")
 st.sidebar.page_link("pages/Sulbar.py", label="Kelapa Sulawesi Barat ")
 st.sidebar.page_link("pages/Polman.py", label="Kelapa Polewali Mandar ")
 st.sidebar.page_link("pages/Majene.py", label="Kelapa Majene ")
-st.title("Selamat Datang di Aplikasi Potensi Kelapa Sulawesi Barat")
+st.title("Informasi Klaster Potensi Daerah Penghasil Kelapa dengan Algoritma K- Means di Sulawesi Barat")
 # Custom CSS untuk mengubah warna latar belakang
 st.markdown(
     """
