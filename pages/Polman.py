@@ -56,7 +56,7 @@ st.pyplot(fig1)
 scaler = StandardScaler()
 x_scaled = scaler.fit_transform(x)
 st.sidebar.subheader("Nilai jumlah K")
-clust = st.sidebar.slider("Pilih Jumlah Cluster ", 2, 10, 3, 1)
+clust = st.sidebar.slider("Pilih Jumlah Cluster ", 2, 8, 3, 1)
 
 # Proses K-Means Clustering dengan jumlah cluster berdasarkan slider
 kmeans = KMeans(n_clusters=clust, init='k-means++', random_state=42)
